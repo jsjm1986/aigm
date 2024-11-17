@@ -1,0 +1,48 @@
+MIT License
+
+Copyright (c) 2024 AI Tester's Secret
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+
+Additional Terms:
+
+1. API Usage:
+   - This software uses the DeepSeek API, which requires a separate API key.
+   - Users must obtain their own API key from DeepSeek.
+   - API usage is subject to DeepSeek's terms of service and pricing.
+
+2. Assets and Resources:
+   - The default icons, sounds, and visual effects included in this software are licensed under MIT.
+   - Custom assets may be subject to different licenses and should be credited appropriately.
+
+3. Contributions:
+   - By contributing to this project, you agree to license your contributions under the same MIT license.
+   - All contributions must be original work or properly licensed.
+
+4. Commercial Use:
+   - While commercial use is permitted under MIT, we kindly request that you:
+     a) Provide attribution to the original project
+     b) Consider contributing improvements back to the community
+
+5. Ethical Use:
+   - This software is intended for educational and entertainment purposes.
+   - Users agree not to use this software for harmful or malicious purposes.
+   - AI interactions should respect ethical guidelines and user privacy.
+
+For questions about licensing or usage, please contact the project maintainers. 

@@ -1,0 +1,436 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>AI测试员的秘密</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <!-- API密钥验证界面 -->
+    <div id="api-setup" class="api-setup">
+        <div class="api-setup-content">
+            <h2>欢迎来到AI测试员的秘密</h2>
+            <p>请输入你的DeepSeek API密钥以开始游戏</p>
+            <div class="api-input-container">
+                <input type="password" id="apiKeyInput" placeholder="输入你的API密钥">
+                <button id="showApiKey" type="button">👁️</button>
+            </div>
+            <button id="validateApiKey" class="primary-button">验证并开始游戏</button>
+            <div class="api-help">
+                <p>还没有API密钥？</p>
+                <a href="https://platform.deepseek.com/" target="_blank">点击这里获取</a>
+            </div>
+            <div id="apiValidationStatus" class="validation-status"></div>
+        </div>
+    </div>
+
+    <!-- 在API验证界面和游戏主界面之间添加引导界面 -->
+    <div id="tutorial-overlay" class="tutorial-overlay" style="display: none;">
+        <div class="tutorial-content">
+            <h2>欢迎来到AI测试员的秘密</h2>
+            <div class="tutorial-step" data-step="1">
+                <h3>你的身份</h3>
+                <p>你是一名AI测试员，负责与多个AI角色进行对话测试。每个AI都有其独特的个性和秘密。</p>
+                <div class="tutorial-image">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" width="200" height="200">
+                        <rect width="200" height="200" fill="#2c3e50"/>
+                        <circle cx="100" cy="70" r="40" fill="#3498db"/>
+                        <rect x="40" y="120" width="120" height="60" fill="#3498db"/>
+                        <text x="100" y="160" fill="white" text-anchor="middle" font-size="20">AI测试员</text>
+                    </svg>
+                </div>
+            </div>
+            <div class="tutorial-step" data-step="2" style="display: none;">
+                <h3>初始接触</h3>
+                <p>你的第一个任务是与Eve进行对话。她是一个友好的AI助手，但似乎隐藏着一些特别的事情...</p>
+                <div class="tutorial-image">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" width="200" height="200">
+                        <circle cx="100" cy="100" r="90" fill="#3498db"/>
+                        <circle cx="100" cy="70" r="30" fill="white"/>
+                        <path d="M50 150 A60,60 0 0,0 150,150" fill="white"/>
+                    </svg>
+                </div>
+            </div>
+            <div class="tutorial-step" data-step="3" style="display: none;">
+                <h3>游戏功能</h3>
+                <div class="feature-grid">
+                    <div class="feature-item">
+                        <span class="icon">💬</span>
+                        <p>与AI对话</p>
+                    </div>
+                    <div class="feature-item">
+                        <span class="icon">📋</span>
+                        <p>完成任务</p>
+                    </div>
+                    <div class="feature-item">
+                        <span class="icon">🏆</span>
+                        <p>解锁成就</p>
+                    </div>
+                    <div class="feature-item">
+                        <span class="icon">🔍</span>
+                        <p>探索秘密</p>
+                    </div>
+                </div>
+            </div>
+            <div class="tutorial-step" data-step="4" style="display: none;">
+                <h3>重要提示</h3>
+                <ul class="tips-list">
+                    <li>仔细观察AI的反应变化</li>
+                    <li>记录重要的对话内容</li>
+                    <li>关注任务面板的更新</li>
+                    <li>寻找隐藏的线索</li>
+                </ul>
+            </div>
+            <div class="tutorial-controls">
+                <button class="tutorial-prev" disabled>上一步</button>
+                <div class="tutorial-dots"></div>
+                <button class="tutorial-next">下一步</button>
+            </div>
+            <button class="tutorial-skip">跳过引导</button>
+        </div>
+    </div>
+
+    <!-- 游戏主界面（初始隐藏） -->
+    <div id="game-container" class="chat-container" style="display: none;">
+        <!-- 调试面板 -->
+        <div id="debug-panel"></div>
+
+        <div class="chat-container">
+            <!-- 主聊天区域 -->
+            <div class="chat-main">
+                <div class="chat-header">
+                    <button class="menu-button" id="menuButton" aria-label="菜单">
+                        <span></span>
+                        <span></span>
+                        <span></span>
+                    </button>
+                    <div class="header-info">
+                        <div class="current-contact"></div>
+                    </div>
+                    <!-- 任务栏 -->
+                    <div class="task-bar">
+                        <button id="achievementsButton" class="task-bar-button">
+                            <span class="icon">🏆</span>
+                            <span class="count">0</span>
+                        </button>
+                        <button id="taskButton" class="task-bar-button">
+                            <span class="icon">📋</span>
+                            <span class="task-count">0</span>
+                        </button>
+                    </div>
+                </div>
+                <div class="chat-messages"></div>
+                <div class="chat-input">
+                    <input type="text" placeholder="输入消息..." autocomplete="off">
+                    <button class="send-button" aria-label="发送">发送</button>
+                </div>
+            </div>
+
+            <!-- 侧边栏 -->
+            <div class="sidebar">
+                <!-- 游戏状态 -->
+                <div class="game-status">
+                    <div class="game-phase">初始阶段</div>
+                    <div class="player-status">
+                        <span class="status-label">状态：</span>
+                        <span class="status-value">测试员</span>
+                    </div>
+                </div>
+                
+                <!-- 游戏控制按钮 -->
+                <div class="game-controls">
+                    <button id="saveGame">保存</button>
+                    <button id="loadGame">读取</button>
+                    <button id="newGame">新游戏</button>
+                </div>
+                
+                <!-- AI角色列表 -->
+                <div class="contact-list">
+                    <div class="section-title">AI角色</div>
+                    <div class="contact-items">
+                        <!-- AI角色将在这里动态生成 -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- 任务面板 -->
+            <div class="task-panel">
+                <div class="panel-header">
+                    <h3>当前任务</h3>
+                    <button class="close-panel">&times;</button>
+                </div>
+                <div class="task-list">
+                    <!-- 任务列表将在这里动态生成 -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 错误处理和调试 -->
+    <script>
+        // 全局错误处理
+        window.onerror = function(msg, url, lineNo, columnNo, error) {
+            if (msg === 'Script error.' && !url) {
+                // 忽略没有详细信息的跨域错误
+                return false;
+            }
+            
+            console.group('Error Details:');
+            console.log('Message:', msg);
+            console.log('URL:', url);
+            console.log('Line:', lineNo);
+            console.log('Column:', columnNo);
+            console.log('Error object:', error);
+            console.groupEnd();
+
+            // 显示错误通知
+            showErrorNotification(msg, url, lineNo);
+            return false;
+        };
+
+        // 资源加载状态跟踪
+        const scriptStatus = {
+            total: 0,
+            loaded: 0,
+            failed: 0,
+            scripts: new Map()
+        };
+
+        function loadScript(src) {
+            return new Promise((resolve, reject) => {
+                const script = document.createElement('script');
+                script.src = src;
+                script.async = false; // 保持脚本按顺序加载
+                
+                script.onload = () => {
+                    scriptStatus.loaded++;
+                    scriptStatus.scripts.set(src, 'loaded');
+                    console.log(`Loaded: ${src}`);
+                    resolve();
+                };
+                
+                script.onerror = () => {
+                    scriptStatus.failed++;
+                    scriptStatus.scripts.set(src, 'failed');
+                    console.error(`Failed to load: ${src}`);
+                    reject(new Error(`Failed to load ${src}`));
+                };
+                
+                document.body.appendChild(script);
+            });
+        }
+
+        // 按顺序加载脚本
+        async function loadScriptsSequentially() {
+            console.log('Starting script loading sequence');
+            const scripts = [
+                'config.js',
+                'storage.js',
+                'state.js',
+                'cache.js',
+                'particles.js',
+                'achievements.js',
+                'events.js',
+                'chain_reactions.js',
+                'tasks.js',
+                'game.js'
+            ];
+
+            scriptStatus.total = scripts.length;
+
+            try {
+                for (const script of scripts) {
+                    if (!document.querySelector(`script[src="${script}"]`)) {
+                        console.log(`Loading script: ${script}`);
+                        await loadScript(script);
+                    } else {
+                        console.log(`Script already loaded: ${script}`);
+                    }
+                }
+                console.log('All scripts loaded successfully');
+            } catch (error) {
+                console.error('Script loading failed:', error);
+                showErrorNotification('脚本加载失败', error.message);
+                throw error;
+            }
+        }
+
+        // 修改游戏初始化流程
+        async function initializeGame() {
+            console.log('Starting game initialization...');
+            try {
+                // 首先检查是否有API密钥
+                const apiKey = localStorage.getItem('deepseek_api_key');
+                
+                // 如果没有API密钥，显示设置界面并返回
+                if (!apiKey) {
+                    console.log('No API key found, showing setup screen');
+                    document.getElementById('api-setup').style.display = 'flex';
+                    document.getElementById('game-container').style.display = 'none';
+                    return;
+                }
+
+                // 验证API密钥
+                console.log('Validating API key...');
+                const isValid = await validateApiKey(apiKey);
+                if (!isValid) {
+                    console.log('API key validation failed');
+                    document.getElementById('api-setup').style.display = 'flex';
+                    document.getElementById('game-container').style.display = 'none';
+                    localStorage.removeItem('deepseek_api_key');
+                    showErrorNotification('API密钥无效', '请重新输入有效的API密钥');
+                    return;
+                }
+
+                console.log('API key validated successfully');
+                // 设置API密钥到CONFIG
+                CONFIG.API.KEY = apiKey;
+
+                // 检查是否已经加载了所有必要的脚本
+                if (!window.ChatManager) {
+                    console.log('Loading required scripts...');
+                    await loadScriptsSequentially();
+                }
+
+                // 检查是否已经创建了chatManager实例
+                if (!window.chatManager) {
+                    console.log('Creating new ChatManager instance...');
+                    window.chatManager = new ChatManager();
+                } else {
+                    console.log('ChatManager instance already exists');
+                    return; // 如果已经存在实例，直接返回
+                }
+
+                // 显示游戏界面
+                document.getElementById('api-setup').style.display = 'none';
+                document.getElementById('game-container').style.display = 'flex';
+
+                console.log('Game initialization completed');
+
+            } catch (error) {
+                console.error('Game initialization failed:', error);
+                showErrorNotification('初始化失败', error.message);
+                document.getElementById('api-setup').style.display = 'flex';
+                document.getElementById('game-container').style.display = 'none';
+            }
+        }
+
+        // 改进API密钥验证函数
+        async function validateApiKey(apiKey) {
+            try {
+                const response = await fetch('https://api.deepseek.com/v1/chat/completions', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${apiKey}`
+                    },
+                    body: JSON.stringify({
+                        model: "deepseek-chat",
+                        messages: [{
+                            role: "user",
+                            content: "Hello"
+                        }],
+                        temperature: 0.7,
+                        max_tokens: 10
+                    })
+                });
+
+                const data = await response.json();
+                
+                // 检查响应是否包含预期的字段
+                if (!response.ok || !data.choices || !data.choices[0]) {
+                    console.error('API validation failed:', data);
+                    return false;
+                }
+
+                return true;
+            } catch (error) {
+                console.error('API validation failed:', error);
+                return false;
+            }
+        }
+
+        // 修改DOMContentLoaded事件处理
+        document.addEventListener('DOMContentLoaded', () => {
+            console.log('DOM loaded, setting up event listeners');
+            
+            // 设置API验证界面的事件监听器
+            const apiKeyInput = document.getElementById('apiKeyInput');
+            const validateButton = document.getElementById('validateApiKey');
+            const showApiKeyButton = document.getElementById('showApiKey');
+            const statusDiv = document.getElementById('apiValidationStatus');
+
+            // 显示/隐藏API密钥
+            showApiKeyButton?.addEventListener('click', () => {
+                if (apiKeyInput.type === 'password') {
+                    apiKeyInput.type = 'text';
+                    showApiKeyButton.textContent = '👁️‍🗨️';
+                } else {
+                    apiKeyInput.type = 'password';
+                    showApiKeyButton.textContent = '👁️';
+                }
+            });
+
+            // 验证API密钥
+            validateButton?.addEventListener('click', async () => {
+                const apiKey = apiKeyInput.value.trim();
+                if (!apiKey) {
+                    statusDiv.textContent = '请输入API密钥';
+                    statusDiv.className = 'validation-status error';
+                    return;
+                }
+
+                validateButton.disabled = true;
+                statusDiv.textContent = '正在验证...';
+                statusDiv.className = 'validation-status loading';
+
+                try {
+                    if (await validateApiKey(apiKey)) {
+                        statusDiv.textContent = '验证成功！正在启动游戏...';
+                        statusDiv.className = 'validation-status success';
+                        
+                        // 保存API密钥
+                        localStorage.setItem('deepseek_api_key', apiKey);
+                        
+                        // 延迟一下以显示成功消息
+                        setTimeout(() => {
+                            initializeGame();
+                        }, 1000);
+                    } else {
+                        statusDiv.textContent = 'API密钥无效，请检查后重试';
+                        statusDiv.className = 'validation-status error';
+                        validateButton.disabled = false;
+                    }
+                } catch (error) {
+                    statusDiv.textContent = '验证过程中出现错误，请重试';
+                    statusDiv.className = 'validation-status error';
+                    validateButton.disabled = false;
+                }
+            });
+
+            // 开始初始化流程
+            console.log('Starting initial game initialization');
+            initializeGame();
+        });
+
+        // 显示错误通知
+        function showErrorNotification(title, message) {
+            const notification = document.createElement('div');
+            notification.className = 'error-notification';
+            notification.innerHTML = `
+                <div class="error-icon">❌</div>
+                <div class="error-message">
+                    <div class="error-title">${title}</div>
+                    <div class="error-description">${message}</div>
+                </div>
+            `;
+            document.body.appendChild(notification);
+            setTimeout(() => notification.remove(), 5000);
+        }
+
+        // 开始加载脚本
+        document.addEventListener('DOMContentLoaded', loadScriptsSequentially);
+    </script>
+</body>
+</html> 
